@@ -1,0 +1,7 @@
+{
+  "name": "puppeteer-lambda",
+  "version": "1.0.0",
+  "description": "Test to run Puppeteer and Chromium inside an AWS Lambda",
+  "main": "index.js",
+  "license": "MIT"
+}
