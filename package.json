@@ -12,12 +12,14 @@
     "format": "prettier 'src/**/*.{ts,js,json}' --write"
   },
   "dependencies": {
+    "aws-lambda": "^1.0.7",
     "chrome-aws-lambda": "^10.1.0",
     "puppeteer-core": "^15.3.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
     "@commitlint/config-conventional": "^17.0.3",
+    "@types/aws-lambda": "^8.10.101",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
     "eslint": "^8.19.0",
