@@ -13,6 +13,6 @@ COPY package.json .
 RUN yarn install --production
 
 FROM public.ecr.aws/lambda/nodejs:16 as production
-COPY --from=builder /usr/src/app/dist/ ./dist
-COPY --from=dependencies /usr/src/app/node_modules/ ./dist/node_modules
-CMD [ "app.lambdaHandler" ]
+COPY --from=builder /usr/src/app/dist/ ./
+COPY --from=dependencies /usr/src/app/node_modules/ ./node_modules
+CMD [ "app.handler" ]
