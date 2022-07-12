@@ -10,36 +10,43 @@ export const lambdaHandler = async (
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
   console.log(`Context: ${JSON.stringify(context, null, 2)}`);
 
-  let browser: Browser | undefined;
+  return callback(null, {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'success',
+    }),
+  });
 
-  try {
-    browser = await chromium.puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
-    });
-
-    const page = await browser.newPage();
-
-    await page.goto('https://google.com');
-
-    const result = await page.title();
-
-    console.log(`Title: ${result}`);
-
-    return callback(null, {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: result,
-      }),
-    });
-  } catch (e) {
-    return callback(e as Error);
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
-  }
+  // let browser: Browser | undefined;
+  //
+  // try {
+  //   browser = await chromium.puppeteer.launch({
+  //     args: chromium.args,
+  //     defaultViewport: chromium.defaultViewport,
+  //     executablePath: await chromium.executablePath,
+  //     headless: chromium.headless,
+  //     ignoreHTTPSErrors: true,
+  //   });
+  //
+  //   const page = await browser.newPage();
+  //
+  //   await page.goto('https://google.com');
+  //
+  //   const result = await page.title();
+  //
+  //   console.log(`Title: ${result}`);
+  //
+  //   return callback(null, {
+  //     statusCode: 200,
+  //     body: JSON.stringify({
+  //       message: result,
+  //     }),
+  //   });
+  // } catch (e) {
+  //   return callback(e as Error);
+  // } finally {
+  //   if (browser) {
+  //     await browser.close();
+  //   }
+  // }
 };
