@@ -12,9 +12,7 @@ FROM base as dependencies
 COPY package.json .
 RUN yarn install --production
 
-FROM base as production
+FROM public.ecr.aws/lambda/nodejs:16 as production
 COPY --from=builder /usr/src/app/dist/ ./dist
 COPY --from=dependencies /usr/src/app/node_modules/ ./dist/node_modules
-EXPOSE 3000
-ENV SO_PORT 3000
-CMD [ "node", "dist/index.js" ]
+CMD [ "app.lambdaHandler" ]
