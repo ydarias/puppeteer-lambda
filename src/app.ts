@@ -13,6 +13,7 @@ exports.handler = async (event: APIGatewayEvent, context: Context): Promise<APIG
   try {
     console.log('configuring the proxy URL ...');
     const proxyURL = process.env.BRIGHT_DATA_PROXY || '';
+    console.log(`Using proxy ${proxyURL}`);
     const localizedProxyURL = LinkedinProxy.getFor(proxyURL);
     const intermediateProxy = await proxyChain.anonymizeProxy(localizedProxyURL);
 
