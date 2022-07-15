@@ -2,7 +2,6 @@ import {APIGatewayEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import {Browser} from 'puppeteer-core';
 import chromium from 'chrome-aws-lambda';
 import proxyChain from 'proxy-chain';
-import {LinkedinProxy} from './linkedinProxy';
 
 exports.handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
@@ -11,11 +10,8 @@ exports.handler = async (event: APIGatewayEvent, context: Context): Promise<APIG
   let browser: Browser | undefined;
 
   try {
-    console.log(`Running at ${process.env.AWS_REGION}`);
-
     console.log('configuring the proxy URL ...');
     const proxyURL = process.env.BRIGHT_DATA_PROXY || '';
-    console.log(`Using proxy ${proxyURL}`);
     const intermediateProxy = await proxyChain.anonymizeProxy(proxyURL);
 
     console.log('creating browser ...');
