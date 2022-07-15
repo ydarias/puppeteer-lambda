@@ -14,6 +14,7 @@
   "dependencies": {
     "aws-lambda": "^1.0.7",
     "chrome-aws-lambda": "10.1.0",
+    "proxy-chain": "^2.0.3",
     "puppeteer-core": "10.1.0"
   },
   "devDependencies": {
