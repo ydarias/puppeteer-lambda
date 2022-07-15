@@ -1,33 +1,32 @@
-import {APIGatewayEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
+import {APIGatewayProxyResult} from 'aws-lambda';
 import {Browser} from 'puppeteer-core';
 import chromium from 'chrome-aws-lambda';
-import proxyChain from 'proxy-chain';
 
-exports.handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
-  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-
+export const handler = async (): Promise<APIGatewayProxyResult> => {
   let browser: Browser | undefined;
 
   try {
-    console.log('configuring the proxy URL ...');
-    const proxyURL = process.env.BRIGHT_DATA_PROXY || '';
-    const intermediateProxy = await proxyChain.anonymizeProxy(proxyURL);
+    const proxyURL = process.env.BRIGHT_DATA_PROXY;
+    const username = `${process.env.BRIGHT_DATA_USERNAME}`;
+    const password = `${process.env.BRIGHT_DATA_PASSWORD}`;
+    const headless = process.env.HEADLESS !== 'false';
 
     console.log('creating browser ...');
     browser = await chromium.puppeteer.launch({
-      args: ['--no-sandbox', `--proxy-server=${intermediateProxy}`],
+      args: ['--no-sandbox', `--proxy-server=${proxyURL}`],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
-      headless: false,
+      headless,
       ignoreHTTPSErrors: true,
     });
 
     console.log('creating a new page ...');
     const page = await browser.newPage();
 
-    console.log('navigating to Google ...');
-    await page.goto('https://google.com');
+    await page.authenticate({username, password});
+
+    console.log('navigating to my blog ...');
+    await page.goto('https://ydarias.github.io');
 
     const result = await page.title();
 
