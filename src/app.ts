@@ -13,7 +13,7 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
 
     console.log('creating browser ...');
     browser = await chromium.puppeteer.launch({
-      args: ['--no-sandbox', `--proxy-server=${proxyURL}`],
+      // args: ['--no-sandbox', `--proxy-server=${proxyURL}`],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
       headless,
@@ -22,11 +22,10 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
 
     console.log('creating a new page ...');
     const page = await browser.newPage();
-
-    await page.authenticate({username, password});
+    // await page.authenticate({username, password});
 
     console.log('navigating to my blog ...');
-    await page.goto('https://ydarias.github.io', {waitUntil: 'domcontentloaded'});
+    await page.goto('https://ydarias.github.io');
 
     const result = await page.title();
 
