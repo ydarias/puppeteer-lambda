@@ -11,12 +11,12 @@ exports.handler = async (event: APIGatewayEvent, context: Context): Promise<APIG
   let browser: Browser | undefined;
 
   try {
+    console.log(`Running at ${process.env.AWS_REGION}`);
+
     console.log('configuring the proxy URL ...');
-    console.log(`ENV is ${JSON.stringify(process.env, null, 4)}`);
     const proxyURL = process.env.BRIGHT_DATA_PROXY || '';
     console.log(`Using proxy ${proxyURL}`);
-    const localizedProxyURL = LinkedinProxy.getFor(proxyURL);
-    const intermediateProxy = await proxyChain.anonymizeProxy(localizedProxyURL);
+    const intermediateProxy = await proxyChain.anonymizeProxy(proxyURL);
 
     console.log('creating browser ...');
     browser = await chromium.puppeteer.launch({
