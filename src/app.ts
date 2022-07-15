@@ -26,7 +26,7 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
     await page.authenticate({username, password});
 
     console.log('navigating to my blog ...');
-    await page.goto('https://ydarias.github.io');
+    await page.goto('https://ydarias.github.io', {waitUntil: 'domcontentloaded'});
 
     const result = await page.title();
 
@@ -36,6 +36,7 @@ export const handler = async (): Promise<APIGatewayProxyResult> => {
       statusCode: 200,
       body: JSON.stringify({
         message: result,
+        cookies: page.cookies(),
       }),
     };
   } catch (e) {
