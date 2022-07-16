@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "aws-lambda": "^1.0.7",
-    "chrome-aws-lambda": "^10.1.0",
-    "puppeteer-core": "^15.4.0"
+    "chrome-aws-lambda": "10.1.0",
+    "puppeteer-core": "10.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
