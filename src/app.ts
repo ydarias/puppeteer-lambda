@@ -1,6 +1,7 @@
-import {APIGatewayEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
+import {APIGatewayProxyResult, Context} from 'aws-lambda';
 import chromium from 'chrome-aws-lambda';
 import {Browser, Page} from 'puppeteer-core';
+import {HandlerEvent} from './models';
 
 export const createBrowser = async (): Promise<Browser> => {
   console.log('creating browser ...');
@@ -40,9 +41,7 @@ export const extractPageTitle = async (url: string): Promise<string> => {
     console.log(`Visiting page ${url}`);
 
     await page.goto(url);
-    const result = await page.title();
-
-    return result;
+    return page.title();
   } catch (e) {
     console.error(e);
 
@@ -55,11 +54,11 @@ export const extractPageTitle = async (url: string): Promise<string> => {
   }
 };
 
-export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: HandlerEvent, context: Context): Promise<APIGatewayProxyResult> => {
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
   console.log(`Context: ${JSON.stringify(context, null, 2)}`);
 
-  const result = await extractPageTitle('https://ydarias.github.io');
+  const result = await extractPageTitle(event.url);
 
   console.log(`Title: ${result}`);
 
