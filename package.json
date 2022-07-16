@@ -6,15 +6,13 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "start:dev": "ts-node src/app.ts",
     "lint": "eslint src/**/*.ts",
     "format": "prettier 'src/**/*.{ts,js,json}' --write"
   },
   "dependencies": {
     "aws-lambda": "^1.0.7",
-    "chrome-aws-lambda": "10.1.0",
-    "puppeteer-core": "10.1.0"
+    "chrome-aws-lambda": "^10.1.0",
+    "puppeteer-core": "^15.4.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",

@@ -5,11 +5,13 @@ FROM base as builder
 COPY package.json .
 COPY tsconfig.json .
 COPY src/ .
+ENV PUPPETEER_SKIP_DOWNLOAD true
 RUN yarn install
 RUN yarn build
 
 FROM base as dependencies
 COPY package.json .
+ENV PUPPETEER_SKIP_DOWNLOAD true
 RUN yarn install --production
 
 FROM public.ecr.aws/lambda/nodejs:16 as production

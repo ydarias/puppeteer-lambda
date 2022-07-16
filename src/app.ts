@@ -1,56 +1,68 @@
-import {APIGatewayProxyResult} from 'aws-lambda';
-import {Browser} from 'puppeteer-core';
+import {APIGatewayEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import chromium from 'chrome-aws-lambda';
+import {Browser, Page} from 'puppeteer-core';
 
-export const handler = async (): Promise<APIGatewayProxyResult> => {
+export const createBrowser = async (): Promise<Browser> => {
+  console.log('creating browser ...');
+
+  const proxyURL = process.env.BRIGHT_DATA_PROXY;
+  const headless = process.env.HEADLESS !== 'false';
+
+  return chromium.puppeteer.launch({
+    headless,
+    args: ['--no-sandbox', `--proxy-server=${proxyURL}`],
+  });
+};
+
+export const loadPage = async (browser: Browser): Promise<Page> => {
+  console.log('creating a new page ...');
+
+  const username = `${process.env.BRIGHT_DATA_USERNAME}`;
+  const password = `${process.env.BRIGHT_DATA_PASSWORD}`;
+
+  const page = await browser.newPage();
+  await page.authenticate({username, password});
+
+  return page;
+};
+
+export const extractPageTitle = async (url: string): Promise<string> => {
   let browser: Browser | undefined;
 
   try {
-    const proxyURL = process.env.BRIGHT_DATA_PROXY;
-    const username = `${process.env.BRIGHT_DATA_USERNAME}`;
-    const password = `${process.env.BRIGHT_DATA_PASSWORD}`;
-    const headless = process.env.HEADLESS !== 'false';
+    browser = await createBrowser();
+    const page = await loadPage(browser);
 
-    console.log('creating browser ...');
-    browser = await chromium.puppeteer.launch({
-      // args: ['--no-sandbox', `--proxy-server=${proxyURL}`],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
-      headless,
-      ignoreHTTPSErrors: true,
-    });
+    console.log(`Visiting page ${url}`);
 
-    console.log('creating a new page ...');
-    const page = await browser.newPage();
-    // await page.authenticate({username, password});
-
-    console.log('navigating to my blog ...');
-    await page.goto('https://ydarias.github.io');
-
+    await page.goto(url);
     const result = await page.title();
 
-    console.log(`Title: ${result}`);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: result,
-        cookies: page.cookies(),
-      }),
-    };
+    return result;
   } catch (e) {
     console.error(e);
 
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'error',
-      }),
-    };
+    return '';
   } finally {
     if (browser) {
       console.log('Closing browser instance ...');
       await browser.close();
     }
   }
+};
+
+export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
+  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+
+  const result = await extractPageTitle('https://ydarias.github.io');
+
+  console.log(`Title: ${result}`);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: result,
+    }),
+  };
 };
