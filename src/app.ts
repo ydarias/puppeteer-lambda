@@ -48,8 +48,12 @@ export const extractPageTitle = async (url: string): Promise<string> => {
     return '';
   } finally {
     if (browser) {
-      console.log('Closing browser instance ...');
-      await browser.close();
+      try {
+        console.log('Closing browser instance ...');
+        await browser.close();
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 };
