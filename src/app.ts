@@ -15,7 +15,7 @@ export const createBrowser = async (): Promise<Browser> => {
     args,
     executablePath: await chromium.executablePath,
     ignoreHTTPSErrors: true,
-    defaultViewport: await chromium.defaultViewport,
+    defaultViewport: chromium.defaultViewport,
   });
 };
 
@@ -41,7 +41,9 @@ export const extractPageTitle = async (url: string): Promise<string> => {
     console.log(`Visiting page ${url}`);
 
     await page.goto(url);
-    return page.title();
+    const result = await page.title();
+
+    return result;
   } catch (e) {
     console.error(e);
 
