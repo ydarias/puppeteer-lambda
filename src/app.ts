@@ -7,10 +7,14 @@ export const createBrowser = async (): Promise<Browser> => {
 
   const proxyURL = process.env.BRIGHT_DATA_PROXY;
   const headless = process.env.HEADLESS !== 'false';
+  const args = [...chromium.args, `--proxy-server=${proxyURL}`];
 
   return chromium.puppeteer.launch({
     headless,
-    args: ['--no-sandbox', `--proxy-server=${proxyURL}`],
+    args,
+    executablePath: await chromium.executablePath,
+    ignoreHTTPSErrors: true,
+    defaultViewport: await chromium.defaultViewport,
   });
 };
 
