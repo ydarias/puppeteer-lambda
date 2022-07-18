@@ -1,4 +1,4 @@
-import {APIGatewayEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
+import {SQSBatchResponse, SQSEvent} from 'aws-lambda';
 import chromium from 'chrome-aws-lambda';
 import {Browser, Page, Protocol} from 'puppeteer-core';
 import {HandlerEvent} from './models';
@@ -61,7 +61,9 @@ export const extractPageTitle = async (url: string, cookies: Protocol.Network.Co
   }
 };
 
-export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const handler = async (events: SQSEvent): Promise<SQSBatchResponse> => {
+  const event = events.Records[0];
+
   const body: HandlerEvent = JSON.parse(event.body || '');
 
   console.log(`Body: ${JSON.stringify(body, null, 2)}`);
@@ -71,9 +73,6 @@ export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyRe
   console.log(`Title: ${result}`);
 
   return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: result,
-    }),
+    batchItemFailures: [],
   };
 };
