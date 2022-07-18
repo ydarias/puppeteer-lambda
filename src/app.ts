@@ -1,6 +1,6 @@
-import {APIGatewayProxyResult, Context} from 'aws-lambda';
+import {APIGatewayEvent, APIGatewayProxyResult, Context} from 'aws-lambda';
 import chromium from 'chrome-aws-lambda';
-import {Browser, Page} from 'puppeteer-core';
+import {Browser, Page, Protocol} from 'puppeteer-core';
 import {HandlerEvent} from './models';
 
 export const createBrowser = async (): Promise<Browser> => {
@@ -19,7 +19,7 @@ export const createBrowser = async (): Promise<Browser> => {
   });
 };
 
-export const loadPage = async (browser: Browser): Promise<Page> => {
+export const loadPage = async (browser: Browser, cookies: Protocol.Network.CookieParam[] = []): Promise<Page> => {
   console.log('creating a new page ...');
 
   const username = `${process.env.BRIGHT_DATA_USERNAME}`;
@@ -27,16 +27,17 @@ export const loadPage = async (browser: Browser): Promise<Page> => {
 
   const page = await browser.newPage();
   await page.authenticate({username, password});
+  await page.setCookie(...cookies);
 
   return page;
 };
 
-export const extractPageTitle = async (url: string): Promise<string> => {
+export const extractPageTitle = async (url: string, cookies: Protocol.Network.CookieParam[] = []): Promise<string> => {
   let browser: Browser | undefined;
 
   try {
     browser = await createBrowser();
-    const page = await loadPage(browser);
+    const page = await loadPage(browser, cookies);
 
     console.log(`Visiting page ${url}`);
 
@@ -60,11 +61,12 @@ export const extractPageTitle = async (url: string): Promise<string> => {
   }
 };
 
-export const handler = async (event: HandlerEvent, context: Context): Promise<APIGatewayProxyResult> => {
-  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+  const body: HandlerEvent = JSON.parse(event.body || '');
 
-  const result = await extractPageTitle(event.url);
+  console.log(`Body: ${JSON.stringify(body, null, 2)}`);
+
+  const result = await extractPageTitle(body.url, body.cookies || []);
 
   console.log(`Title: ${result}`);
 
