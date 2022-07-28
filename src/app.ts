@@ -1,5 +1,5 @@
 import {SQSEvent} from 'aws-lambda';
-import chromium from 'chrome-aws-lambda';
+import chromium from '@sparticuz/chrome-aws-lambda';
 import {Browser, Page, Protocol} from 'puppeteer-core';
 import {HandlerEvent} from './models';
 
