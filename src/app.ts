@@ -1,4 +1,4 @@
-import {SQSBatchResponse, SQSEvent} from 'aws-lambda';
+import {SQSEvent} from 'aws-lambda';
 import chromium from 'chrome-aws-lambda';
 import {Browser, Page, Protocol} from 'puppeteer-core';
 import {HandlerEvent} from './models';
@@ -10,10 +10,14 @@ export const createBrowser = async (): Promise<Browser> => {
   const headless = process.env.HEADLESS !== 'false';
   const args = [...chromium.args, `--proxy-server=${proxyURL}`];
 
+  const executablePath = await chromium.executablePath;
+
+  console.log(`executable path is ${executablePath}`);
+
   return chromium.puppeteer.launch({
     headless,
     args,
-    executablePath: await chromium.executablePath,
+    executablePath,
     ignoreHTTPSErrors: true,
     defaultViewport: chromium.defaultViewport,
   });
@@ -61,7 +65,7 @@ export const extractPageTitle = async (url: string, cookies: Protocol.Network.Co
   }
 };
 
-export const handler = async (events: SQSEvent): Promise<SQSBatchResponse> => {
+export const handler = async (events: SQSEvent): Promise<void> => {
   const event = events.Records[0];
 
   const body: HandlerEvent = JSON.parse(event.body || '');
@@ -71,8 +75,4 @@ export const handler = async (events: SQSEvent): Promise<SQSBatchResponse> => {
   const result = await extractPageTitle(body.url, body.cookies || []);
 
   console.log(`Title: ${result}`);
-
-  return {
-    batchItemFailures: [],
-  };
 };
